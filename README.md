@@ -1,3 +1,4 @@
+
 # CryptoViever
 
 Version 0.0.1 - this project is in alpha state - do not use in production environment !
@@ -27,16 +28,17 @@ v0.0.1 - 09/05/2019
 
 If you want to support this project, you can donate for help us to improve CryptoViewer :
 
-BTC : 1DNYC3ibPh9PfrL2Jh6giPiQ2rzQA8itj1
-ETH : 0x5FF900f50D485BE73B7f9e12Dc9aa1De0D0cDe10
-FDR : FHqMLmYaPtST6LQ8qzR31NUoLZVGzPjDFs
-LTC : LM4VcZYvqbJDZLKWMUryvpvi2V35G6UVUS
-TRX : TYZPrjpSNhnWaMVce9se3W2M6PQ4emJCar
-SSX : SfQdgjSMivPioamoDWdxFT2GpEersLqfvC
-XMR : 42EKhBsBpEy9TDBH3Bsh8RP1AXWmqQR6yLVdDJbFeSjeJD9SMEWurSgPtixn2DHy8119j6GbNJX1bM4B7WLUFZD1NtzCEm8
+* BTC : 1DNYC3ibPh9PfrL2Jh6giPiQ2rzQA8itj1
+* ETH : 0x5FF900f50D485BE73B7f9e12Dc9aa1De0D0cDe10
+* FDR : FHqMLmYaPtST6LQ8qzR31NUoLZVGzPjDFs
+* LTC : LM4VcZYvqbJDZLKWMUryvpvi2V35G6UVUS
+* TRX : TYZPrjpSNhnWaMVce9se3W2M6PQ4emJCar
+* SSX : SfQdgjSMivPioamoDWdxFT2GpEersLqfvC
+* XMR : 42EKhBsBpEy9TDBH3Bsh8RP1AXWmqQR6yLVdDJbFeSjeJD9SMEWurSgPtixn2DHy8119j6GbNJX1bM4B7WLUFZD1NtzCEm8
 
 ## ToDo list 
 
+* Auto refresh after Add
 * Add delete button
 * Form control for wallet address (no space / no special char, only letters & numbers)
 * Add more & more coins
