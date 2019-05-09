@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>CWV - CryptoWalletView</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	</head>
+	<body>
+	
+		<div class="container">
+		
+			<h1 class="m-3 text-center">Crypto Viewer</h1>
+		
+			<div class="row">
+			
+				<div class="col-sm alert alert-info">
+					<h2>Add your wallet</h2>
+					<div class="form-inline mt-4">
+						<label class="sr-only" for="wallet">Wallet</label>
+						<input type="text" class="form-control mb-2 mr-sm-2" id="wallet" placeholder="Your wallet">
+
+						<div class="input-group mb-2 mr-sm-2">
+							<div class="input-group-prepend">
+								<div class="input-group-text">$</div>
+							</div>
+							<select class="custom-select" id="coin">
+							</select>
+						</div>
+						<button id="addCoin" type="submit" class="btn btn-primary mb-2">Add</button>
+					</div>
+				</div>
+				
+				<div class="col-sm alert alert-success">
+					<h2>Total</h2>
+					<p>BTC : <span id="totalBTC">0</span></p>
+					<p>USD : <span id="totalUSD">0</span></p>
+				</div>
+			</div>
+			
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Coin</th>
+						<th>Wallet</th>
+						<th>Number of Coin</th>
+						<th>BTC Value</th>
+						<th>USD Value</th>
+					</tr>
+				</thead>
+				<tbody id="coinList">
+				</tbody>
+			</table>
+		</div>
+		
+		<!-- JS Scripts -->
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
+		<script>	
+			$(function() {
+				corsProxy = "http://127.0.0.1:3000/pipe/";
+				explorers = {
+					"agu": "http://explorer.agouti.io/ext/getbalance/###"
+					"btc" : "https://blockexplorer.com/api/addr/###/balance",
+					"cloak": "https://chainz.cryptoid.info/cloak/api.dws?q=getbalance&a=###",
+					"fdr" : "https://blockexplorer.fdreserve.com/ext/getbalance/###",
+					"ltc" : "https://litecoinblockexplorer.net/api/addr/###/balance",
+				};
+	
+				geckoIds = [];
+				
+				$.each(explorers,function(index,value){
+					$('#coin').append($("<option></option>").attr("value", index).text(index.toUpperCase()));
+				});
+
+				coins = $.map(explorers, function(element,index) {return index}).sort();
+				$.ajax({
+					url: "https://api.coingecko.com/api/v3/coins/list",
+					type: 'GET',
+					success: function(coinsIds) { 
+
+						for (var i = 0; i < localStorage.length; i++) {
+							key = localStorage.key(i);
+							values = localStorage.getItem(localStorage.key(i)).split(";");
+							
+							$.grep(coinsIds, function (obj) {
+								if (obj.symbol === key ) {
+									geckoIds+= obj.id+",";
+									coinId = obj.id;
+								}
+							});
+							
+							$.each(values, function(index, value) {
+								if ($.inArray(key, coins) !== -1) {
+									$("#coinList").append("<tr class=\"wallet\"><td data-id=\""+coinId+"\" class=\"symbol\">"+key+"</td><td class=\"address\">"+value+"</td><td class=\"count\"></td><td class=\"btcPrice\"></td><td class=\"usdPrice\"></td></tr>");
+								}	
+							});
+						}
+					},
+					complete: function(){
+						$.get(corsProxy+"https://api.coingecko.com/api/v3/simple/price?ids="+geckoIds+"&vs_currencies=btc%2Cusd&include_market_cap=false&include_24hr_vol=false&include_24hr_change=false&include_last_updated_at=false", function (prices) {
+							$('#coinList > tr').each(function(index) {
+								line = $(this);
+								symbol = line.find('.symbol').text().toLowerCase(); 
+								money = line.find('.symbol').data('id');
+								wallet = line.find('.address').text();
+								balanceUrl = corsProxy+explorers[symbol].replace("###", wallet);
+								$.ajax({
+									url: balanceUrl,
+									type: 'GET',
+									async: false,
+									success: function(data) { 
+										nbCoins = Number(data).toFixed(2);
+										line.find('.count').text(nbCoins);
+									},
+									complete: function() { 
+										btcPrice = Number(prices[money].btc*nbCoins).toFixed(8);
+										line.find('.btcPrice').text(btcPrice);
+										totalBTC = $('#totalBTC').text();
+										$('#totalBTC').text(Number(totalBTC)+Number(btcPrice));
+										usdPrice = Number(prices[money].usd*nbCoins).toFixed(2);
+										line.find('.usdPrice').text(usdPrice);
+										totalUSD = $('#totalUSD').text();
+										$('#totalUSD').text(Number(totalUSD)+Number(usdPrice));
+									}
+								});
+							});
+						});
+						
+					}
+				});
+			
+		
+				$('#addCoin').on('click tap', function(){
+					coin = $('#coin').val();
+					wallet = $('#wallet').val();
+					
+					if (localStorage.getItem(coin) == null) {
+						localStorage.setItem(coin, wallet);
+					} else {
+						value = localStorage.getItem(coin)+";"+wallet;
+						localStorage.setItem(coin, value);
+					}
+				});
+			});
+		</script>
+		
+	</body>
+</html>
